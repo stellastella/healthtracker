@@ -53,11 +53,13 @@ Follow these steps to get HealthTracker Pro up and running on your local machine
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository_url>2. Install Dependencies
+git clone <repository_url>
+2. Install Dependencies
 
 npm install
 # or
 yarn install
+```
 3. Supabase Setup
 HealthTracker Pro uses Supabase for its backend services (database, authentication).
 
@@ -117,3 +119,4 @@ Made with ❤️ by your team, powered by Bolt.new
 
 
 cd healthtracker-pro
+
