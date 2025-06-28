@@ -53,5 +53,67 @@ Follow these steps to get HealthTracker Pro up and running on your local machine
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository_url>
+git clone <repository_url>2. Install Dependencies
+
+npm install
+# or
+yarn install
+3. Supabase Setup
+HealthTracker Pro uses Supabase for its backend services (database, authentication).
+
+Create a Supabase Project:
+
+Go to Supabase and sign up or log in.
+Create a new project.
+Set up Database Schema:
+
+Navigate to the SQL Editor in your Supabase project dashboard.
+Open the migration files located in supabase/migrations/ in this repository.
+Copy the content of each .sql file (in chronological order) and paste it into the Supabase SQL Editor. Run each script to create the necessary tables, set up Row Level Security (RLS), and create the default admin user.
+Get Supabase Credentials:
+
+In your Supabase project dashboard, go to Project Settings > API.
+Copy your Project URL and anon public key.
+Configure Environment Variables:
+
+Create a new file named .env in the root of your project (where package.json is located).
+Copy the content from .env.example into your new .env file.
+Replace the placeholder values with your actual Supabase credentials:
+
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+4. Run the Application
+
+npm run dev
+# or
+yarn dev
+The application should now be running at http://localhost:5173 (or another port if 5173 is in use).
+
+🚀 Usage
+Access the App: Open your web browser and navigate to the local development server URL.
+Sign Up / Sign In: Create a new account or sign in with existing credentials.
+Admin Access: A default admin user is created during Supabase setup:
+Email: angel@email.com
+Password: angel1234
+You can access the Admin Dashboard by navigating to /admin in your browser.
+Track Health Data: Use the intuitive forms to add new blood pressure and blood sugar readings.
+Explore Insights: Navigate through the "Overview", "History", "Trends", "Analytics", and "Recommendations" tabs to visualize your data and gain insights.
+Manage Data: Use the import/export features to back up or transfer your data.
+Read Blog Posts: Explore the health education blog for valuable information and tips.
+🤝 Contributing
+We welcome contributions to HealthTracker Pro! If you'd like to contribute, please follow these steps:
+
+Fork the repository.
+Create a new branch (git checkout -b feature/your-feature-name).
+Make your changes and commit them (git commit -m 'Add new feature').
+Push to the branch (git push origin feature/your-feature-name).
+Create a new Pull Request.
+📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+Made with ❤️ by your team, powered by Bolt.new
+
+
+
+
 cd healthtracker-pro
