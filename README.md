@@ -1,7 +1,5 @@
 # HealthTracker Pro
 
-![HealthTracker Pro Dashboard](https://images.pexels.com/photos/4145353/pexels-photo-4145353.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)
-
 HealthTracker Pro is a comprehensive, privacy-first health monitoring application designed to empower users to take control of their well-being. It allows you to track vital health metrics like blood pressure and blood sugar, visualize trends, receive personalized insights, and manage your health data securely.
 
 ## ✨ Features
