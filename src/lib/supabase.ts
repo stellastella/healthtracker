@@ -3,14 +3,41 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Fallback to empty strings if env vars are missing to prevent crashes
-const url = supabaseUrl || '';
-const key = supabaseAnonKey || '';
+// Check if environment variables are properly configured
+const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
-// Log warning if env vars are missing
-if (!url || !key) {
-  console.warn('Missing Supabase environment variables. Please check your .env file.');
+const hasValidConfig = supabaseUrl && 
+                     supabaseAnonKey && 
+                     supabaseUrl !== 'your_supabase_project_url' && 
+                     supabaseAnonKey !== 'your_supabase_anon_key' &&
+                     isValidUrl(supabaseUrl);
+
+if (!hasValidConfig) {
+  console.error(`
+🔧 Supabase Configuration Required
+
+Please set up your Supabase credentials:
+
+1. Click the "Connect to Supabase" button in the top right corner
+2. Or manually update your .env file with:
+   - VITE_SUPABASE_URL=https://your-project.supabase.co
+   - VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+You can find these values in your Supabase project dashboard:
+Project Settings > API > Project URL and anon/public key
+  `);
 }
+
+// Use fallback values to prevent crashes during development
+const url = hasValidConfig ? supabaseUrl : 'https://placeholder.supabase.co';
+const key = hasValidConfig ? supabaseAnonKey : 'placeholder-key';
 
 // Create client with optimized options and custom error handling
 export const supabase = createClient(url, key, {
@@ -22,6 +49,20 @@ export const supabase = createClient(url, key, {
   global: {
     // Custom fetch function to handle refresh token errors and session errors
     fetch: async (url, options) => {
+      // If we don't have valid config, return a mock response to prevent network errors
+      if (!hasValidConfig) {
+        return new Response(JSON.stringify({ 
+          error: 'Supabase not configured',
+          message: 'Please configure your Supabase credentials' 
+        }), {
+          status: 400,
+          statusText: 'Configuration Required',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+
       const response = await fetch(url, {
         ...options,
         // Reduce timeout for faster failure detection
@@ -95,6 +136,9 @@ export const supabase = createClient(url, key, {
   // Add debug logging in development
   debug: process.env.NODE_ENV === 'development'
 });
+
+// Export configuration status for components to check
+export const isSupabaseConfigured = hasValidConfig;
 
 // Database types
 export interface Database {
