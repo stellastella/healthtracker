@@ -7,8 +7,19 @@ interface BloodSugarRecommendationsProps {
   readings: BloodSugarReading[];
 }
 
+// Utility: filter readings from the last 7 days
+function getLast7DaysReadings<T extends { timestamp: string }>(readings: T[]): T[] {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  return readings.filter(r => new Date(r.timestamp) >= sevenDaysAgo);
+}
+
 const BloodSugarRecommendations: React.FC<BloodSugarRecommendationsProps> = ({ readings }) => {
-  if (readings.length === 0) {
+  // Only use readings from the last 7 days
+  const recentReadings = getLast7DaysReadings(readings);
+
+  if (recentReadings.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
         <div className="text-center">
@@ -21,12 +32,12 @@ const BloodSugarRecommendations: React.FC<BloodSugarRecommendationsProps> = ({ r
   }
 
   // Calculate average glucose and determine category
-  const avgGlucose = Math.round(readings.reduce((sum, r) => sum + r.glucose, 0) / readings.length);
-  const hba1c = calculateHbA1c(readings);
-  const timeInRange = getTimeInRange(readings);
-  const latestReading = readings[0];
+  const avgGlucose = Math.round(recentReadings.reduce((sum, r) => sum + r.glucose, 0) / recentReadings.length);
+  const hba1c = calculateHbA1c(recentReadings);
+  const timeInRange = getTimeInRange(recentReadings);
+  const latestReading = recentReadings[0];
   const latestCategory = categorizeGlucose(latestReading.glucose, latestReading.testType);
-  
+
   // Determine management level
   const isDiabetic = hba1c >= 6.5 || avgGlucose >= 126;
   const isPreDiabetic = !isDiabetic && (hba1c >= 5.7 || avgGlucose >= 100);
@@ -270,9 +281,9 @@ const BloodSugarRecommendations: React.FC<BloodSugarRecommendationsProps> = ({ r
             </div>
           </div>
           <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{readings.length}</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{recentReadings.length}</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Total Readings</div>
-            <div className="text-xs text-gray-500 dark:text-gray-500">Last 30 days</div>
+            <div className="text-xs text-gray-500 dark:text-gray-500">Last 7 days</div>
           </div>
         </div>
       </div>
