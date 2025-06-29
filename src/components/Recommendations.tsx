@@ -7,8 +7,19 @@ interface RecommendationsProps {
   readings: Reading[];
 }
 
+// Utility: filter readings from the last 7 days
+function getLast7DaysReadings<T extends { timestamp: string }>(readings: T[]): T[] {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(now.getDate() - 7);
+  return readings.filter(r => new Date(r.timestamp) >= sevenDaysAgo);
+}
+
 const Recommendations: React.FC<RecommendationsProps> = ({ readings }) => {
-  if (readings.length === 0) {
+  // Only use readings from the last 7 days
+  const recentReadings = getLast7DaysReadings(readings);
+
+  if (recentReadings.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div className="text-center">
@@ -21,10 +32,10 @@ const Recommendations: React.FC<RecommendationsProps> = ({ readings }) => {
   }
 
   // Calculate average BP and determine category
-  const avgSystolic = Math.round(readings.reduce((sum, r) => sum + r.systolic, 0) / readings.length);
-  const avgDiastolic = Math.round(readings.reduce((sum, r) => sum + r.diastolic, 0) / readings.length);
+  const avgSystolic = Math.round(recentReadings.reduce((sum, r) => sum + r.systolic, 0) / recentReadings.length);
+  const avgDiastolic = Math.round(recentReadings.reduce((sum, r) => sum + r.diastolic, 0) / recentReadings.length);
   const category = categorizeBP(avgSystolic, avgDiastolic);
-  const latestReading = readings[0];
+  const latestReading = recentReadings[0];
   const latestCategory = categorizeBP(latestReading.systolic, latestReading.diastolic);
 
   // Determine urgency level
@@ -202,7 +213,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ readings }) => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900">Personalized Recommendations</h2>
           <div className="text-right">
-            <div className="text-sm text-gray-600">Based on your average BP</div>
+            <div className="text-sm text-gray-600">Based on your average BP (last 7 days)</div>
             <div className="text-lg font-semibold text-gray-900">{avgSystolic}/{avgDiastolic} mmHg</div>
             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
               category.color === 'green' ? 'bg-green-100 text-green-800' :
