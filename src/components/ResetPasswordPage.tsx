@@ -267,11 +267,16 @@ const ResetPasswordPage: React.FC = () => {
                   placeholder="Confirm new password"
                   required
                 />
+                {password && confirmPassword && password !== confirmPassword && (
+                  <p className="mt-1 text-xs text-red-500">
+                    Passwords do not match
+                  </p>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting || !isPasswordValid()}
+                disabled={isSubmitting || !isPasswordValid() || password !== confirmPassword}
                 className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
