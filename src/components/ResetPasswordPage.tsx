@@ -26,6 +26,7 @@ const ResetPasswordPage: React.FC = () => {
         console.log('URL:', window.location.href);
         console.log('Hash:', window.location.hash);
         console.log('Search params:', window.location.search);
+        console.log('Pathname:', window.location.pathname);
         
         // Get the hash fragment from the URL
         const hash = window.location.hash;
@@ -53,14 +54,18 @@ const ResetPasswordPage: React.FC = () => {
         // If we have a code parameter, we need to exchange it for a session
         if (code) {
           try {
+            console.log('Exchanging code for session...');
             // Exchange the code for a session
-            const { error } = await supabase.auth.exchangeCodeForSession(code);
+            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+            
             if (error) {
               console.error('Error exchanging code for session:', error);
               setStatus('error');
               setMessage('The password reset link is invalid or has expired. Please request a new password reset link.');
               return;
             }
+            
+            console.log('Session exchange successful:', !!data.session);
           } catch (error) {
             console.error('Error exchanging code for session:', error);
             setStatus('error');
