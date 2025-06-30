@@ -50,6 +50,25 @@ const ResetPasswordPage: React.FC = () => {
           return;
         }
         
+        // If we have a code parameter, we need to exchange it for a session
+        if (code) {
+          try {
+            // Exchange the code for a session
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+            if (error) {
+              console.error('Error exchanging code for session:', error);
+              setStatus('error');
+              setMessage('The password reset link is invalid or has expired. Please request a new password reset link.');
+              return;
+            }
+          } catch (error) {
+            console.error('Error exchanging code for session:', error);
+            setStatus('error');
+            setMessage('An error occurred while processing your password reset link. Please try again or request a new link.');
+            return;
+          }
+        }
+        
         // If we have a valid token or recovery type, we're ready to reset the password
         setStatus('ready');
         setMessage('Please enter your new password below.');
