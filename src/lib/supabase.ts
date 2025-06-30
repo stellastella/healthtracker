@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const siteUrl = import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
 
 // Check if environment variables are properly configured
 const isValidUrl = (url: string) => {
@@ -44,7 +45,10 @@ export const supabase = createClient(url, key, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    // Add redirect URLs for authentication
+    redirectTo: siteUrl
   },
   global: {
     // Custom fetch function to handle refresh token errors and session errors
