@@ -48,7 +48,7 @@ export const supabase = createClient(url, key, {
     detectSessionInUrl: true,
     flowType: 'pkce',
     // Add redirect URLs for authentication
-    redirectTo: `${siteUrl}/auth/reset-password`
+    redirectTo: `${siteUrl}/auth/callback`
   },
   global: {
     // Custom fetch function to handle refresh token errors and session errors

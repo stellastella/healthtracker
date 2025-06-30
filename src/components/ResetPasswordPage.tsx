@@ -19,24 +19,35 @@ const ResetPasswordPage: React.FC = () => {
   });
 
   useEffect(() => {
-    // Check if we have a valid hash in the URL
-    const hash = window.location.hash;
-    const accessToken = hash && hash.substring(1).split('&').find(param => param.startsWith('access_token='));
-    
-    if (!accessToken) {
-      // Also check for type=recovery in the hash which indicates a password reset flow
-      const isRecovery = hash && hash.includes('type=recovery');
-      
-      if (!isRecovery) {
+    // Check for recovery token in the URL
+    const checkForRecoveryToken = async () => {
+      try {
+        // Get the hash fragment from the URL
+        const hash = window.location.hash;
+        
+        // Check for access token in the hash
+        const accessToken = hash && hash.substring(1).split('&').find(param => param.startsWith('access_token='))?.split('=')[1];
+        
+        // Check for type=recovery in the hash which indicates a password reset flow
+        const isRecovery = hash && hash.includes('type=recovery');
+        
+        if (!accessToken && !isRecovery) {
+          setStatus('error');
+          setMessage('Invalid password reset link. Please request a new password reset link.');
+          return;
+        }
+        
+        // If we have a valid token or recovery type, we're ready to reset the password
+        setStatus('ready');
+        setMessage('Please enter your new password below.');
+      } catch (error) {
+        console.error('Error checking recovery token:', error);
         setStatus('error');
-        setMessage('Invalid password reset link. Please request a new password reset link.');
-        return;
+        setMessage('An error occurred while processing your password reset link. Please try again or request a new link.');
       }
-    }
+    };
 
-    // If we have a hash, we're ready to reset the password
-    setStatus('ready');
-    setMessage('Please enter your new password below.');
+    checkForRecoveryToken();
   }, []);
 
   // Validate password as user types
@@ -76,8 +87,8 @@ const ResetPasswordPage: React.FC = () => {
       const hash = window.location.hash;
       const accessToken = hash && hash.substring(1).split('&').find(param => param.startsWith('access_token='))?.split('=')[1];
       
+      // If we have an access token, set the session
       if (accessToken) {
-        // Set the session with the access token
         await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: '',

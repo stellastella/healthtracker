@@ -31,9 +31,16 @@ const renderApp = () => {
   if (!root) return;
 
   // Check if this is an auth route
-  const isAuthConfirmation = window.location.pathname.includes('/auth/confirm');
-  const isResetPassword = window.location.pathname.includes('/auth/reset-password') || 
-                          window.location.hash.includes('type=recovery');
+  const pathname = window.location.pathname;
+  const hash = window.location.hash;
+  
+  // Check for auth confirmation route
+  const isAuthConfirmation = pathname.includes('/auth/confirm');
+  
+  // Check for password reset route - check both path and hash for recovery tokens
+  const isResetPassword = pathname.includes('/auth/reset-password') || 
+                          hash.includes('type=recovery') || 
+                          hash.includes('access_token=');
 
   const AppWithProviders = () => (
     <ThemeProvider>
