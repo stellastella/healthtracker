@@ -21,7 +21,9 @@ const ResetPasswordPage: React.FC = () => {
   useEffect(() => {
     // Check if we have a valid hash in the URL
     const hash = window.location.hash;
-    if (!hash) {
+    const accessToken = hash && hash.substring(1).split('&').find(param => param.startsWith('access_token='));
+    
+    if (!accessToken) {
       setStatus('error');
       setMessage('Invalid password reset link. Please request a new password reset link.');
       return;
@@ -65,6 +67,21 @@ const ResetPasswordPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // Extract the access token from the URL hash
+      const hash = window.location.hash;
+      const accessToken = hash && hash.substring(1).split('&').find(param => param.startsWith('access_token='))?.split('=')[1];
+      
+      if (!accessToken) {
+        throw new Error('No access token found in URL');
+      }
+      
+      // Set the session with the access token
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: '',
+      });
+      
+      // Update the password
       const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
