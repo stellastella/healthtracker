@@ -31,8 +31,9 @@ const renderApp = () => {
   if (!root) return;
 
   // Check if this is an auth route
-  const isAuthConfirmation = window.location.pathname.startsWith('/auth/confirm');
-  const isResetPassword = window.location.pathname.startsWith('/auth/reset-password');
+  const isAuthConfirmation = window.location.pathname.includes('/auth/confirm');
+  const isResetPassword = window.location.pathname.includes('/auth/reset-password') || 
+                          window.location.hash.includes('type=recovery');
 
   const AppWithProviders = () => (
     <ThemeProvider>
