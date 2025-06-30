@@ -63,7 +63,11 @@ const renderApp = () => {
     </ThemeProvider>
   );
 
-  createRoot(root).render(<AppWithProviders />);
+  createRoot(root).render(
+    <StrictMode>
+      <AppWithProviders />
+    </StrictMode>
+  );
 };
 
 // Check if the document is ready

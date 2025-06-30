@@ -268,7 +268,7 @@ const ResetPasswordPage: React.FC = () => {
                   required
                 />
                 {password && confirmPassword && password !== confirmPassword && (
-                  <p className="mt-1 text-xs text-red-500">
+                  <p className="mt-1 text-xs text-red-500 dark:text-red-400">
                     Passwords do not match
                   </p>
                 )}
