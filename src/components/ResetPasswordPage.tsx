@@ -22,6 +22,11 @@ const ResetPasswordPage: React.FC = () => {
     // Check for recovery token in the URL
     const checkForRecoveryToken = async () => {
       try {
+        console.log('Checking for recovery token...');
+        console.log('URL:', window.location.href);
+        console.log('Hash:', window.location.hash);
+        console.log('Search params:', window.location.search);
+        
         // Get the hash fragment from the URL
         const hash = window.location.hash;
         
@@ -30,6 +35,9 @@ const ResetPasswordPage: React.FC = () => {
         
         // Check for type=recovery in the hash which indicates a password reset flow
         const isRecovery = hash && hash.includes('type=recovery');
+        
+        console.log('Access token found:', !!accessToken);
+        console.log('Is recovery flow:', isRecovery);
         
         if (!accessToken && !isRecovery) {
           setStatus('error');
@@ -83,17 +91,7 @@ const ResetPasswordPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Extract the access token from the URL hash
-      const hash = window.location.hash;
-      const accessToken = hash && hash.substring(1).split('&').find(param => param.startsWith('access_token='))?.split('=')[1];
-      
-      // If we have an access token, set the session
-      if (accessToken) {
-        await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: '',
-        });
-      }
+      console.log('Attempting to reset password...');
       
       // Update the password
       const { error } = await supabase.auth.updateUser({ password });
@@ -103,6 +101,7 @@ const ResetPasswordPage: React.FC = () => {
         setStatus('error');
         setMessage(error.message || 'Failed to reset password. Please try again.');
       } else {
+        console.log('Password reset successful!');
         setStatus('success');
         setMessage('Your password has been successfully reset! You can now sign in with your new password.');
       }

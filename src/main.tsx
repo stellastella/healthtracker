@@ -42,6 +42,14 @@ const renderApp = () => {
                           hash.includes('type=recovery') || 
                           hash.includes('access_token=');
 
+  // Log for debugging
+  console.log('Auth route detection:', { 
+    pathname, 
+    hash, 
+    isAuthConfirmation, 
+    isResetPassword 
+  });
+
   const AppWithProviders = () => (
     <ThemeProvider>
       <AuthProvider>
