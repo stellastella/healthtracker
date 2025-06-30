@@ -74,6 +74,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
   if (!isOpen) return null;
 
   const getErrorMessage = (error: any): string => {
+    // Handle rate limiting errors specifically
+    if (error?.message?.includes('over_email_send_rate_limit') || 
+        error?.code === 'over_email_send_rate_limit') {
+      return 'Too many email requests sent recently. Please wait a few minutes before trying again to avoid rate limiting.';
+    }
+    
     if (error?.message?.includes('Invalid login credentials')) {
       return 'Invalid email or password. Please check your credentials and try again.';
     }
