@@ -257,6 +257,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Get the site URL from environment variables or use the current origin
       const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
       
+      console.log('Reset password redirect URL:', `${siteUrl}/auth/reset-password`);
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${siteUrl}/auth/reset-password`,
       });

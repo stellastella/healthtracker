@@ -33,6 +33,7 @@ const renderApp = () => {
   // Check if this is an auth route
   const pathname = window.location.pathname;
   const hash = window.location.hash;
+  const searchParams = new URLSearchParams(window.location.search);
   
   // Check for auth confirmation route
   const isAuthConfirmation = pathname.includes('/auth/confirm');
@@ -40,12 +41,14 @@ const renderApp = () => {
   // Check for password reset route - check both path and hash for recovery tokens
   const isResetPassword = pathname.includes('/auth/reset-password') || 
                           hash.includes('type=recovery') || 
-                          hash.includes('access_token=');
+                          hash.includes('access_token=') ||
+                          searchParams.has('code');
 
   // Log for debugging
   console.log('Auth route detection:', { 
     pathname, 
     hash, 
+    searchParams: Object.fromEntries(searchParams),
     isAuthConfirmation, 
     isResetPassword 
   });

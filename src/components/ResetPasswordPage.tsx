@@ -36,10 +36,15 @@ const ResetPasswordPage: React.FC = () => {
         // Check for type=recovery in the hash which indicates a password reset flow
         const isRecovery = hash && hash.includes('type=recovery');
         
+        // Check for code in query parameters (Supabase sometimes uses this format)
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get('code');
+        
         console.log('Access token found:', !!accessToken);
         console.log('Is recovery flow:', isRecovery);
+        console.log('Code found:', !!code);
         
-        if (!accessToken && !isRecovery) {
+        if (!accessToken && !isRecovery && !code) {
           setStatus('error');
           setMessage('Invalid password reset link. Please request a new password reset link.');
           return;
