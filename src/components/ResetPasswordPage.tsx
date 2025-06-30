@@ -17,16 +17,23 @@ const ResetPasswordPage: React.FC = () => {
     lowercase: false,
     number: false
   });
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
+
+  // Add debug logging function
+  const addDebugLog = (message: string) => {
+    console.log(message);
+    setDebugInfo(prev => [...prev, message]);
+  };
 
   useEffect(() => {
     // Check for recovery token in the URL
     const checkForRecoveryToken = async () => {
       try {
-        console.log('Checking for recovery token...');
-        console.log('URL:', window.location.href);
-        console.log('Hash:', window.location.hash);
-        console.log('Search params:', window.location.search);
-        console.log('Pathname:', window.location.pathname);
+        addDebugLog('Checking for recovery token...');
+        addDebugLog('URL: ' + window.location.href);
+        addDebugLog('Hash: ' + window.location.hash);
+        addDebugLog('Search params: ' + window.location.search);
+        addDebugLog('Pathname: ' + window.location.pathname);
         
         // Get the hash fragment from the URL
         const hash = window.location.hash;
@@ -41,9 +48,9 @@ const ResetPasswordPage: React.FC = () => {
         const searchParams = new URLSearchParams(window.location.search);
         const code = searchParams.get('code');
         
-        console.log('Access token found:', !!accessToken);
-        console.log('Is recovery flow:', isRecovery);
-        console.log('Code found:', !!code);
+        addDebugLog('Access token found: ' + !!accessToken);
+        addDebugLog('Is recovery flow: ' + isRecovery);
+        addDebugLog('Code found: ' + !!code);
         
         if (!accessToken && !isRecovery && !code) {
           setStatus('error');
@@ -54,20 +61,27 @@ const ResetPasswordPage: React.FC = () => {
         // If we have a code parameter, we need to exchange it for a session
         if (code) {
           try {
-            console.log('Exchanging code for session...');
+            addDebugLog('Exchanging code for session...');
             // Exchange the code for a session
             const { data, error } = await supabase.auth.exchangeCodeForSession(code);
             
             if (error) {
-              console.error('Error exchanging code for session:', error);
+              addDebugLog('Error exchanging code for session: ' + error.message);
               setStatus('error');
               setMessage('The password reset link is invalid or has expired. Please request a new password reset link.');
               return;
             }
             
-            console.log('Session exchange successful:', !!data.session);
-          } catch (error) {
-            console.error('Error exchanging code for session:', error);
+            addDebugLog('Session exchange successful: ' + !!data.session);
+            
+            // If we have a session, we're ready to reset the password
+            if (data.session) {
+              setStatus('ready');
+              setMessage('Please enter your new password below.');
+              return;
+            }
+          } catch (error: any) {
+            addDebugLog('Error exchanging code for session: ' + error.message);
             setStatus('error');
             setMessage('An error occurred while processing your password reset link. Please try again or request a new link.');
             return;
@@ -77,8 +91,8 @@ const ResetPasswordPage: React.FC = () => {
         // If we have a valid token or recovery type, we're ready to reset the password
         setStatus('ready');
         setMessage('Please enter your new password below.');
-      } catch (error) {
-        console.error('Error checking recovery token:', error);
+      } catch (error: any) {
+        addDebugLog('Error checking recovery token: ' + error.message);
         setStatus('error');
         setMessage('An error occurred while processing your password reset link. Please try again or request a new link.');
       }
@@ -120,22 +134,22 @@ const ResetPasswordPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      console.log('Attempting to reset password...');
+      addDebugLog('Attempting to reset password...');
       
       // Update the password
       const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
-        console.error('Error resetting password:', error);
+        addDebugLog('Error resetting password: ' + error.message);
         setStatus('error');
         setMessage(error.message || 'Failed to reset password. Please try again.');
       } else {
-        console.log('Password reset successful!');
+        addDebugLog('Password reset successful!');
         setStatus('success');
         setMessage('Your password has been successfully reset! You can now sign in with your new password.');
       }
-    } catch (error) {
-      console.error('Error resetting password:', error);
+    } catch (error: any) {
+      addDebugLog('Error resetting password: ' + error.message);
       setStatus('error');
       setMessage('An unexpected error occurred. Please try again.');
     } finally {
@@ -377,6 +391,20 @@ const ResetPasswordPage: React.FC = () => {
                 <LogIn className="h-5 w-5" />
                 <span>Try Again</span>
               </a>
+            </div>
+          </div>
+        )}
+
+        {/* Debug Information (only visible in development) */}
+        {process.env.NODE_ENV === 'development' && debugInfo.length > 0 && (
+          <div className="mt-8 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <h3 className={`text-sm font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Debug Info:</h3>
+            <div className="text-xs space-y-1 max-h-40 overflow-y-auto">
+              {debugInfo.map((log, index) => (
+                <div key={index} className={isDark ? 'text-gray-400' : 'text-gray-600'}>
+                  {log}
+                </div>
+              ))}
             </div>
           </div>
         )}

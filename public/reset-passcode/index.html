@@ -45,22 +45,14 @@
       margin-bottom: 24px;
       line-height: 1.5;
     }
+    #debug {
+      font-size: 12px;
+      color: #666;
+      margin-top: 20px;
+      text-align: left;
+      display: none;
+    }
   </style>
-  <script>
-    // Redirect to the main app with the query parameters preserved
-    window.onload = function() {
-      const queryParams = window.location.search;
-      const hash = window.location.hash;
-      
-      // Log for debugging
-      console.log('Redirecting from reset-passcode page');
-      console.log('Query params:', queryParams);
-      console.log('Hash:', hash);
-      
-      // Redirect to the main app
-      window.location.href = '/' + (queryParams ? queryParams : '') + (hash ? hash : '');
-    };
-  </script>
 </head>
 <body>
   <div class="container">
@@ -68,10 +60,72 @@
     <h1>Password Reset</h1>
     <p>Redirecting you to the password reset page...</p>
     <p>If you are not redirected automatically, <a href="/" id="manual-redirect">click here</a>.</p>
+    <div id="debug"></div>
   </div>
+
   <script>
-    // Update the manual redirect link to include query params and hash
-    document.getElementById('manual-redirect').href = '/' + (window.location.search || '') + (window.location.hash || '');
+    // Function to log information for debugging
+    function logDebug(message) {
+      const debugElement = document.getElementById('debug');
+      const logLine = document.createElement('div');
+      logLine.textContent = message;
+      debugElement.appendChild(logLine);
+      console.log(message);
+    }
+
+    // Show debug info in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      document.getElementById('debug').style.display = 'block';
+    }
+
+    // Redirect to the main app with the query parameters preserved
+    window.onload = function() {
+      try {
+        const queryParams = window.location.search;
+        const hash = window.location.hash;
+        
+        // Log for debugging
+        logDebug('Redirecting from reset-passcode page');
+        logDebug('URL: ' + window.location.href);
+        logDebug('Query params: ' + queryParams);
+        logDebug('Hash: ' + hash);
+        
+        // Extract the code parameter if it exists
+        const urlParams = new URLSearchParams(queryParams);
+        const code = urlParams.get('code');
+        
+        if (code) {
+          logDebug('Found code parameter: ' + code);
+        }
+        
+        // Create the redirect URL
+        let redirectUrl = '/';
+        
+        // Add query parameters if they exist
+        if (queryParams) {
+          redirectUrl += queryParams;
+        }
+        
+        // Add hash if it exists
+        if (hash) {
+          redirectUrl += hash;
+        }
+        
+        // Update the manual redirect link
+        document.getElementById('manual-redirect').href = redirectUrl;
+        
+        logDebug('Redirecting to: ' + redirectUrl);
+        
+        // Redirect after a short delay to ensure logs are visible
+        setTimeout(function() {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } catch (error) {
+        logDebug('Error during redirect: ' + error.message);
+        // Fallback to simple redirect
+        window.location.href = '/';
+      }
+    };
   </script>
 </body>
 </html>
