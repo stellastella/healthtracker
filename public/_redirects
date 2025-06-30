@@ -1,2 +1,6 @@
 # Redirect all routes to index.html for SPA routing
 /*  /index.html  200
+
+# Specific redirects for auth routes
+/auth/reset-password/* /index.html 200
+/reset-passcode/* /index.html 200
